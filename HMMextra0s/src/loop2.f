@@ -2,34 +2,36 @@
 c     second loop (backward eqns) 
       implicit none
       integer i, j, m, T
-      double precision phi(m), sumphi, lscale
+      double precision phi(m), sumphi, lscale, lscalearr(T-1)
       double precision pRS(T,m), gamma(m,m), logbet(T,m)
       double precision tmp(m)
 c     the above array occurs in the subroutine call for
 c     memory allocation reasons in non gfortran compilers
 c     its contents are purely internal to this subroutine
-      i = T-1
-      do while(i .ge. 1)
-          j = 1
-          do while(j .le. m)
+      do i = T-1,1,-1
+          do j = 1,m
               phi(j) = phi(j)*pRS(i+1, j)
-              j = j+1
           enddo
           call multi2(m, gamma, phi, tmp)
-          j = 1
           sumphi=0.0
-          do while(j .le. m)
-              logbet(i,j) = dlog(phi(j)) + lscale
+          do j = 1,m
+              logbet(i,j) = phi(j)
               sumphi = sumphi + phi(j)
-              j = j+1
           enddo
-          j = 1
-          do while(j .le. m)
+          do j = 1,m
               phi(j) = phi(j)/sumphi
-              j = j+1
           enddo
+          lscalearr(i) = lscale
           lscale = lscale + dlog(sumphi)
-          i = i-1
+      enddo
+
+c     Separate this loop to invert loop nest order and enable
+c     vectorisation of inner loop
+      do j = 1,m
+          do i = 1,T-1
+              logbet(i,j) = dlog(logbet(i,j)) + lscalearr(i)
+          enddo
+          logbet(T,j) = 0.0d0
       enddo
       end
 
@@ -40,20 +42,14 @@ c     b is replaced by the matrix product of a*b
       implicit none
       integer m, j, k
       double precision a(m, m), b(m), c(m)
-      j = 1
-      do while(j .le. m)
-          k = 1
+      do j = 1,m
           c(j) = 0
-          do while(k .le. m)
+          do k = 1,m
               c(j) = c(j) + a(j, k)*b(k)
-              k = k+1
           enddo
-          j = j+1
       enddo
-      j = 1
-      do while(j .le. m)
+      do j = 1,m
           b(j) = c(j)
-          j = j+1
       enddo
       end
 
