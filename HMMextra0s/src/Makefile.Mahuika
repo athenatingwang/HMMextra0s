@@ -9,7 +9,7 @@ LDFLAGS = -shared
 HMMextra0s.so : loop1.o loop2.o
 	$(FC) -o $@ $(FCFLAGS) $+ $(LDFLAGS)
 
-%.o : %.f
+%.o : %.f90
 	$(FC) -c $(FCFLAGS) $<
 
 clean :
