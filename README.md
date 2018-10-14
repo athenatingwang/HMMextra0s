@@ -8,6 +8,12 @@ R package for hidden Markov models with observations having extra zeros. The obs
 R CMD build HMMextra0s
 ```
 
+## How to install
+
+```
+R CMD INSTALL HMMextra0s
+```
+
 ## How to test 
 
 ```
