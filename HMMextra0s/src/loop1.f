@@ -2,35 +2,34 @@
 c     first loop (forward eqns)
       implicit none
       integer i, j, m, T
-      double precision phi(m), sumphi, lscale
+      double precision phi(m), sumphi, lscale, lscalearr(T)
       double precision pRS(T,m), gamma(m,m), logalp(T,m)
       double precision tmp(m)
 c     the above array occurs in the subroutine call for
 c     memory allocation reasons in non gfortran compilers
 c     its contents are purely internal to this subroutine
-      lscale = 0
-      i = 1
-      do while(i .le. T)
+      lscale = 0.0d0
+      do i = 1,T
           if (i .gt. 1) call multi1(m, phi, gamma, tmp)
-          j = 1
-          sumphi=0.0
-          do while(j .le. m)
+          sumphi=0.0d0
+          do j = 1,m
               phi(j) = phi(j)*pRS(i, j)
               sumphi = sumphi + phi(j)
-              j = j+1
           enddo
-          j = 1
-          do while(j .le. m)
+          do j = 1,m
               phi(j) = phi(j)/sumphi
-              j = j+1
+              logalp(i,j) = phi(j)
           enddo
           lscale = lscale + dlog(sumphi)
-          j = 1
-          do while(j .le. m)
-              logalp(i,j) = dlog(phi(j)) + lscale
-              j = j+1
+          lscalearr(i) = lscale
+      enddo
+
+c     Separate this loop to invert loop nest order and enable
+c     vectorisation of inner loop
+      do j = 1,m
+          do i = 1,T
+              logalp(i,j) = dlog(logalp(i,j)) + lscalearr(i)
           enddo
-          i = i+1
       enddo
       end
 
@@ -41,20 +40,14 @@ c     a is replaced by the matrix product of a*b
       implicit none
       integer m, j, k
       double precision a(m), b(m, m), c(m)
-      j = 1
-      do while(j .le. m)
-          k = 1
+      do j = 1,m
           c(j) = 0
-          do while(k .le. m)
+          do k = 1,m
               c(j) = c(j) + a(k)*b(k, j)
-              k = k+1
           enddo
-          j = j+1
       enddo
-      j = 1
-      do while(j .le. m)
+      do j = 1,m
           a(j) = c(j)
-          j = j+1
       enddo
       end
 
