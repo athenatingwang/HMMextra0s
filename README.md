@@ -17,12 +17,26 @@ R CMD INSTALL HMMextra0s
 ## How to test 
 
 ```
-R CMD check HMMextra0s
+cd TestFiles
+Rscript hmm2dtest.R
+Rscript hmm1dtest.R
 ```
+If the output looks like
+```
+...
+[1] "pie results match."
+[1] "mu results match."
+[1] "sig results match."
+[1] "gamma results match."
+[1] "delta results match."
+[1] "LL results match."
+
+```
+then the tests passed.
 
 ## Troubleshooting
 
-If your gfortran has a non standard installation path, you can use this version like so
+If your gfortran has a non standard installation path, you can R to use this version with
 ```
 mkdir ~/.R
 cat << EOF >> ~/.R/Makevars
