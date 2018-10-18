@@ -34,6 +34,14 @@ If the output looks like
 ```
 then the tests passed.
 
+## Code profiling 
+
+Scripts hmm2dtest.R and hmm1dtest.R contain Rprof instructions which will produce files hmm2dtest_Rprof.out and hmm1dtest_Rprof.out, respectively. Profiling information can be obtained by typing
+```
+R CMD Rprof hmm2dtest_Rprof.out
+R CMD RProf hmm1dtest_Rprof.out
+```
+
 ## Troubleshooting
 
 If your gfortran has a non standard installation path, you can R to use this version with
