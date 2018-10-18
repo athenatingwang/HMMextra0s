@@ -1,0 +1,18 @@
+# Makefile for the Intel Fortran compiler
+# Rename this file to "Makefile" when
+# installing this package on Mahuika
+
+FC = ifort
+FCFLAGS = -fPIC -Ofast
+LDFLAGS = -shared
+
+HMMextra0s.so : loop1.o loop2.o
+	$(FC) -o $@ $(FCFLAGS) $+ $(LDFLAGS)
+
+%.o : %.f90
+	$(FC) -c $(FCFLAGS) $<
+
+clean :
+	rm -f *.o *.so
+
+.PHONY : clean
