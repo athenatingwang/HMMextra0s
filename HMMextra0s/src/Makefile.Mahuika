@@ -6,7 +6,7 @@ FC = ifort
 FCFLAGS = -fPIC -Ofast
 LDFLAGS = -shared
 
-HMMextra0s.so : loop1.o loop2.o
+HMMextra0s.so : loop1.o loop2.o mstep.o
 	$(FC) -o $@ $(FCFLAGS) $+ $(LDFLAGS)
 
 %.o : %.f90
