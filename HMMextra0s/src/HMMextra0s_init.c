@@ -13,10 +13,13 @@ extern void F77_NAME(loop2)(int *m, int *T, double *phi, double *pRS, double *ga
 
 extern void F77_NAME(mstep1d)(int *n, int *m, int *nn, double *v, double *Z, double *R, double *hatpie, double *hatmu, double *hatsig);
 
+extern void F77_NAME(mstep2d)(int *n, int *m, int *nn, double *v, double *Z, double *R, double *hatpie, double *hatmu, double *hatsig);
+
 static const R_FortranMethodDef FortranEntries[] = {
     {"loop1", (DL_FUNC) &F77_NAME(loop1), 8},
     {"loop2", (DL_FUNC) &F77_NAME(loop2), 8},
     {"mstep1d", (DL_FUNC) &F77_NAME(mstep1d), 9},
+    {"mstep2d", (DL_FUNC) &F77_NAME(mstep2d), 9},
     {NULL, NULL, 0}
 };
 

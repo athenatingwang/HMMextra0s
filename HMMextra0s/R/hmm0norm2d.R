@@ -106,20 +106,30 @@ hmm0norm2d <- function( R, Z, pie, gamma, mu, sig, delta, tol=1e-6, print.level=
 #
 ##M-step
 ###Estimate pie_{i}, mu_{ij} and sigma_{ij}
-    hatpie <- NULL
+    hatpie <- rep(0, m)
     hatmu <- matrix( 0, m, n )
     hatsig <- array( 0, dim=c(n,n,m) )
-    for (j in 1:m)
-    { hatpie[j] <- ( v[,j] %*% Z ) / sum( v[,j] )
-      hatmu[j,] <- ( v[Z==1,j] %*% R[Z==1,] ) / sum( v[Z==1,j] )
-      for (kk in 1:n){
-       for (jj in 1:n){ 
-        hatsig[kk,jj,j] <- ( sum( v[Z==1,j] * ( R[Z==1,kk] - hatmu[j,kk] )* 
-                    ( R[Z==1,jj] - hatmu[j,jj] ) ) / 
-                    sum( v[Z==1,j] ) ) 
-       }
-      }
+    if (fortran!=TRUE) {
+        for (j in 1:m) {
+            hatpie[j] <- ( v[,j] %*% Z ) / sum( v[,j] )
+            hatmu[j,] <- ( v[Z==1,j] %*% R[Z==1,] ) / sum( v[Z==1,j] )
+            for (kk in 1:n) {
+                for (jj in 1:n) {
+                    hatsig[kk,jj,j] <- ( sum( v[Z==1,j] * ( R[Z==1,kk] - hatmu[j,kk] )*
+                                       ( R[Z==1,jj] - hatmu[j,jj] ) ) /
+                                         sum( v[Z==1,j] ) )
+                }
+            }
+        }
+    } else {
+        mstep2d <- .Fortran("mstep2d", n, m, nn, v, Z, R,
+                            hatpie, hatmu, hatsig,
+                            PACKAGE="HMMextra0s")
+        hatpie <- mstep2d[[7]]
+        hatmu <- mstep2d[[8]]
+        hatsig <- mstep2d[[9]]
     }
+
 ###Estimate gamma_{ij}
 #
    hatgamma <- matrix( 1, m, m )

@@ -102,7 +102,7 @@ function( R, Z, pie, gamma, mu, sig, delta, tol=1e-6, print.level=1, fortran = T
     hatpie <- rep(0, m)
     hatmu <- matrix( 0, n, m )
     hatsig <- matrix( 0, n, m )
-    if (fortran!=TRUE){
+    if (fortran!=TRUE) {
         for (j in 1:m) {
             hatpie[j] <- ( v[,j] %*% Z ) / sum( v[,j] )
             hatmu[,j] <- ( v[Z==1,j] %*% R[Z==1,] ) / sum( v[Z==1,j] )
