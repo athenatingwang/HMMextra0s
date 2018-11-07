@@ -109,15 +109,7 @@ function( R, Z, pie, gamma, mu, sig, delta, tol=1e-6, print.level=1, fortran = T
                     sum( v[Z==1,j] ) ) }
 ###Estimate gamma_{ij}
 #
-   hatgamma <- matrix( 1, m, m )
-   for (j in 1:m)
-   {
-      for (i in 1:m)
-      {
-         hatgamma[i,j] <- sum( (w[,i,j]) ) / 
-                          ( sum( v[,i] ) - v[nn,i] )
-      }
-   }
+    hatgamma <- colSums( w ) / replicate(m, colSums( v ) - v[nn,])
 #
 ###Estimate delta
     hatdelta <- v[1,]
