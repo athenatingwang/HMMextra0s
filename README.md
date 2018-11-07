@@ -44,7 +44,7 @@ R CMD RProf hmm1dtest_Rprof.out
 
 ## Troubleshooting
 
-If your gfortran has a non standard installation path, you can R to use this version with
+If your gfortran has a non standard installation path, you can tell R to use this version with
 ```
 mkdir ~/.R
 cat << EOF >> ~/.R/Makevars
