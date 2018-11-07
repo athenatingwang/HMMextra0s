@@ -99,14 +99,25 @@ function( R, Z, pie, gamma, mu, sig, delta, tol=1e-6, print.level=1, fortran = T
 #
 ##M-step
 ###Estimate pie_{i}, mu_{ij} and sigma_{ij}
-    hatpie <- NULL
+    hatpie <- rep(0, m)
     hatmu <- matrix( 0, n, m )
     hatsig <- matrix( 0, n, m )
-    for (j in 1:m)
-    { hatpie[j] <- ( v[,j] %*% Z ) / sum( v[,j] )
-      hatmu[,j] <- ( v[Z==1,j] %*% R[Z==1,] ) / sum( v[Z==1,j] )
-      hatsig[,j] <- sqrt( ( v[Z==1,j] %*% ( t(t(R[Z==1,]) - hatmu[,j]) )^2 ) / 
-                    sum( v[Z==1,j] ) ) }
+    if (fortran!=TRUE) {
+        for (j in 1:m) {
+            hatpie[j] <- ( v[,j] %*% Z ) / sum( v[,j] )
+            hatmu[,j] <- ( v[Z==1,j] %*% R[Z==1,] ) / sum( v[Z==1,j] )
+            hatsig[,j] <- sqrt( ( v[Z==1,j] %*% ( t(t(R[Z==1,]) - hatmu[,j]) )^2 ) /
+                                sum( v[Z==1,j] ) )
+        }
+    } else {
+        mstep1d <- .Fortran("mstep1d", n, m, nn, v, Z, R,
+                            hatpie, hatmu, hatsig,
+                            PACKAGE="HMMextra0s")
+        hatpie <- mstep1d[[7]]
+        hatmu <- mstep1d[[8]]
+        hatsig <- mstep1d[[9]]
+    }
+
 ###Estimate gamma_{ij}
 #
     hatgamma <- colSums( w ) / replicate(m, colSums( v ) - v[nn,])
