@@ -59,8 +59,12 @@ subroutine mstep2d(n, m, nn, v, Z, R, hatpie, hatmu, hatsig)
 
         do k = 1,n
             hatmu(j,k) = dot_product(vZ(:),R(:,k))/vdotZ
-            do l = 1,n
+            ! Variance-covariance matrix is symmetric, so compute one triangular part only
+            ! and copy covariances into the other part - this also ensures that hatsig is
+            ! always exactly symmetric
+            do l = 1,k
                 hatsig(k,l,j) = dot_product(vZ(:),(R(:,k)-hatmu(j,k))*(R(:,l)-hatmu(j,l)))/vdotZ
+                if (k.ne.l) hatsig(l,k,j) = hatsig(k,l,j)
             end do
         end do
 
