@@ -19,7 +19,7 @@ hmm0norm2d <- function( R, Z, pie, gamma, mu, sig, delta, tol=1e-6, print.level=
     pRS <- matrix( 1, nn, m )
     for (k in 1:m)
     {
-      pRS[,k] <- ( pie[k] * dmvnorm(R, mean = mu[k,], sigma = sig[,,k]) )^Z * (1-pie[k])^(1-Z)
+      pRS[,k] <- ( pie[k] * dmvnorm(R, mean = mu[k,], sigma = sig[,,k]) )*Z + (1-pie[k])*(1-Z)
     }
 #
 ##Scaled forward variable
