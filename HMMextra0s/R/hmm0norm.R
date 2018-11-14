@@ -9,10 +9,16 @@ function( R, Z, pie, gamma, mu, sig, delta, tol=1e-6, print.level=1, fortran = T
   {
 #
     pRS <- matrix( 1, nn, m )
-    for (k in 1:m)
-    {
-      pRS[,k] <- (pie[k] * exp( - (R[,1] - mu[,k])^2 / (2 * sig[,k]^2) ) /
-                   (sqrt(2 * pi) * sig[,k]) )^(Z) * (1-pie[k])^(1-Z)
+    if (fortran!=TRUE){
+        for (k in 1:m)
+        {
+          pRS[,k] <- (pie[k] * exp( - (R[,1] - mu[,k])^2 / (2 * sig[,k]^2) ) /
+                       (sqrt(2 * pi) * sig[,k]) )*(Z) + (1-pie[k])*(1-Z)
+        }
+    } else {
+        prsloop <- .Fortran("prsloop", m, nn, pie, R[,1], mu[1,], sig[1,], Z,
+                            pRS, PACKAGE="HMMextra0s")
+        pRS <- prsloop[[8]]
     }
 #
 ##Scaled forward variable
