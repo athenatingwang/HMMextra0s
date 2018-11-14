@@ -89,19 +89,31 @@ function( R, Z, pie, gamma, mu, sig, delta, tol=1e-6, print.level=1, fortran = T
     }
 #
 ##E-step
+    if (fortran!=TRUE) {
 ###Calculate v_t(j)
-    v <- exp(logalpha + logbeta - LL)
+        v <- exp(logalpha + logbeta - LL)
 ###Calculate w_t(i,j) 
-    w <- array( NA, c( nn-1, m, m ) )
-    for (k in 1:m) {
-        logprob <- log( pRS[-1, k] )
-        logPi <- matrix(log(gamma[, k]), byrow = TRUE, nrow = nn - 
-            1, ncol = m)
-        logPbeta <- matrix(logprob + logbeta[-1, k],
-            byrow = FALSE, nrow = nn - 1, ncol = m)
-        w[, , k] <- logPi + logalpha[-nn, ] + logPbeta - LL
+        w <- array( NA, c( nn-1, m, m ) )
+        for (k in 1:m) {
+            logprob <- log( pRS[-1, k] )
+            logPi <- matrix(log(gamma[, k]), byrow = TRUE, nrow = nn - 
+                1, ncol = m)
+            logPbeta <- matrix(logprob + logbeta[-1, k],
+                byrow = FALSE, nrow = nn - 1, ncol = m)
+            w[, , k] <- logPi + logalpha[-nn, ] + logPbeta - LL
+        }
+        w <- exp(w)
+    } else {
+        v <- array(0.0, c( nn, m ))
+        w <- array(0.0, c( nn-1, m, m ) )
+# logalpha can contain -Inf values where phi=0; set NAOK=TRUE as the Fortran code
+# will handle such cases safely
+        estep <- .Fortran("estep", m, nn, logalpha, logbeta, LL,
+                           pRS, gamma, v, w, NAOK=TRUE, PACKAGE="HMMextra0s")
+        v <- estep[[8]]
+        w <- estep[[9]]
     }
-    w <- exp(w)
+
 #
 ##M-step
 ###Estimate pie_{i}, mu_{ij} and sigma_{ij}
