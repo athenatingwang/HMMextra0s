@@ -1,4 +1,4 @@
-subroutine loop1(m, T, phi, pRS, gamma, logalp, lscale, tmp)
+subroutine fwdeqns(m, T, phi, pRS, gamma, logalp, lscale, tmp)
     !     first loop (forward eqns)
     implicit none
     integer, parameter :: r8 = selected_real_kind(15, 307)
@@ -32,7 +32,7 @@ subroutine loop1(m, T, phi, pRS, gamma, logalp, lscale, tmp)
             logalp(i,j) = dlog(logalp(i,j)) + lscalearr(i)
         enddo
     enddo
-end subroutine loop1
+end subroutine fwdeqns
 
 subroutine multi1(m, a, b, c)
     !     a is row vector

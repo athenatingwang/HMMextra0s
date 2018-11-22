@@ -1,4 +1,4 @@
-subroutine loop2(m, T, phi, pRS, gamma, logbet, lscale, tmp)
+subroutine bwdeqns(m, T, phi, pRS, gamma, logbet, lscale, tmp)
     !     second loop (backward eqns) 
     implicit none
     integer, parameter :: r8 = selected_real_kind(15, 307)
@@ -34,7 +34,7 @@ subroutine loop2(m, T, phi, pRS, gamma, logbet, lscale, tmp)
         enddo
         logbet(T,j) = 0.0_r8
     enddo
-end subroutine loop2
+end subroutine bwdeqns
 
 subroutine multi2(m, a, b, c)
     !     a is (m*m) matrix

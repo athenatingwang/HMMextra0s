@@ -4,7 +4,7 @@ Title: Hidden Markov Models with Extra Zeros
 Version: 1.0.0
 Imports: mvtnorm, ellipse
 Suggests: HiddenMarkov
-Depends: methods
+Depends: R (>= 3.0.0), methods
 Date: 2018-09-12
 Author: Ting Wang - I am grateful to Jiancang Zhuang for some helpful suggestions and contributions
 Maintainer: Ting Wang <ting.wang@otago.ac.nz>

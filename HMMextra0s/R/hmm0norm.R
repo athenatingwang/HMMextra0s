@@ -16,8 +16,7 @@ function( R, Z, pie, gamma, mu, sig, delta, tol=1e-6, print.level=1, fortran = T
                        (sqrt(2 * pi) * sig[,k]) )*(Z) + (1-pie[k])*(1-Z)
         }
     } else {
-        prsloop <- .Fortran("prsloop", m, nn, pie, R[,1], mu[1,], sig[1,], Z,
-                            pRS, PACKAGE="HMMextra0s")
+        prsloop <- .Fortran(F_prsloop, m, nn, pie, R[,1], mu[1,], sig[1,], Z, pRS)
         pRS <- prsloop[[8]]
     }
 #
@@ -52,11 +51,11 @@ function( R, Z, pie, gamma, mu, sig, delta, tol=1e-6, print.level=1, fortran = T
     }else{
         if (!is.double(gamma)) stop("gamma is not double precision")
         memory0 <- rep(as.double(0), m)
-        loop1 <- .Fortran("loop1", m, nn, phi, pRS, gamma, logalpha,
-                          lscale, memory0, PACKAGE="HMMextra0s")
-        logalpha <- loop1[[6]]
+        fwdeqns <- .Fortran(F_fwdeqns, m, nn, phi, pRS, gamma, logalpha,
+                            lscale, memory0)
+        logalpha <- fwdeqns[[6]]
       if (count > 1.5){
-        LLn = loop1[[7]]
+        LLn = fwdeqns[[7]]
         diffL = LLn - LL 
         print(format(LL,digits=12))
         print(format(LLn,digits=12))
@@ -64,7 +63,7 @@ function( R, Z, pie, gamma, mu, sig, delta, tol=1e-6, print.level=1, fortran = T
         if (LLn < LL) stop ('worse likelihood')
         if (diffL <= tol) break
       } 
-        LL <- loop1[[7]]
+        LL <- fwdeqns[[7]]
     }
 #
 ##Scaled backward variable
@@ -83,9 +82,9 @@ function( R, Z, pie, gamma, mu, sig, delta, tol=1e-6, print.level=1, fortran = T
       }
     } else{
         memory0 <- rep(as.double(0), m)
-        loop2 <- .Fortran("loop2", m, nn, phi, pRS, gamma, logbeta,
-                          lscale, memory0, PACKAGE="HMMextra0s")
-        logbeta <- loop2[[6]]
+        bwdeqns <- .Fortran(F_bwdeqns, m, nn, phi, pRS, gamma, logbeta,
+                            lscale, memory0)
+        logbeta <- bwdeqns[[6]]
     }
 #
 ##E-step
@@ -108,8 +107,8 @@ function( R, Z, pie, gamma, mu, sig, delta, tol=1e-6, print.level=1, fortran = T
         w <- array(0.0, c( nn-1, m, m ) )
 # logalpha can contain -Inf values where phi=0; set NAOK=TRUE as the Fortran code
 # will handle such cases safely
-        estep <- .Fortran("estep", m, nn, logalpha, logbeta, LL,
-                           pRS, gamma, v, w, NAOK=TRUE, PACKAGE="HMMextra0s")
+        estep <- .Fortran(F_estep, m, nn, logalpha, logbeta, LL,
+                           pRS, gamma, v, w, NAOK=TRUE)
         v <- estep[[8]]
         w <- estep[[9]]
     }
@@ -128,9 +127,8 @@ function( R, Z, pie, gamma, mu, sig, delta, tol=1e-6, print.level=1, fortran = T
                                 sum( v[Z==1,j] ) )
         }
     } else {
-        mstep1d <- .Fortran("mstep1d", n, m, nn, v, Z, R,
-                            hatpie, hatmu, hatsig,
-                            PACKAGE="HMMextra0s")
+        mstep1d <- .Fortran(F_mstep1d, n, m, nn, v, Z, R,
+                            hatpie, hatmu, hatsig)
         hatpie <- mstep1d[[7]]
         hatmu <- mstep1d[[8]]
         hatsig <- mstep1d[[9]]
