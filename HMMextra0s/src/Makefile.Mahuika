@@ -2,15 +2,22 @@
 # Rename this file to "Makefile" when
 # installing this package on Mahuika
 
+# Use gcc for symbol registration code
+CC = gcc
+CFLAGS = -I$(R_INCLUDE_DIR) -fPIC
+
 FC = ifort
 FCFLAGS = -fPIC -Ofast
 LDFLAGS = -shared
 
-HMMextra0s.so : prsloop.o fwdeqns.o bwdeqns.o estep.o mstep.o
+HMMextra0s.so : HMMextra0s_init.o prsloop.o fwdeqns.o bwdeqns.o estep.o mstep.o
 	$(FC) -o $@ $(FCFLAGS) $+ $(LDFLAGS)
 
 %.o : %.f90
 	$(FC) -c $(FCFLAGS) $<
+
+%.o : %.c
+	$(CC) -c $(CFLAGS) $<
 
 clean :
 	rm -f *.o *.so
