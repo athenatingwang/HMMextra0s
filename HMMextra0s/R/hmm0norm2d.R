@@ -53,11 +53,11 @@ hmm0norm2d <- function( R, Z, pie, gamma, mu, sig, delta, tol=1e-6, print.level=
     }else{
       if (!is.double(gamma)) stop("gamma is not double precision")
       memory0 <- rep(as.double(0), m)
-      loop1 <- .Fortran("loop1", m, nn, phi, pRS, gamma, logalpha,
-                        lscale, memory0, PACKAGE="HMMextra0s")
-      logalpha <- loop1[[6]]
+      fwdeqns <- .Fortran(F_fwdeqns, m, nn, phi, pRS, gamma, logalpha,
+                          lscale, memory0)
+      logalpha <- fwdeqns[[6]]
       if (count > 1.5){
-        LLn = loop1[[7]]
+        LLn = fwdeqns[[7]]
         diffL = LLn - LL 
         print(format(LL,digits=12))
         print(format(LLn,digits=12))
@@ -65,7 +65,7 @@ hmm0norm2d <- function( R, Z, pie, gamma, mu, sig, delta, tol=1e-6, print.level=
         if (LLn < LL) stop ('worse likelihood')
         if (diffL <= tol) break
       } 
-      LL <- loop1[[7]]
+      LL <- fwdeqns[[7]]
     }
 #
 ##Scaled backward variable
@@ -84,9 +84,9 @@ hmm0norm2d <- function( R, Z, pie, gamma, mu, sig, delta, tol=1e-6, print.level=
       }
     } else{
         memory0 <- rep(as.double(0), m)
-        loop2 <- .Fortran("loop2", m, nn, phi, pRS, gamma, logbeta,
-                          lscale, memory0, PACKAGE="HMMextra0s")
-        logbeta <- loop2[[6]]
+        bwdeqns <- .Fortran(F_bwdeqns, m, nn, phi, pRS, gamma, logbeta,
+                            lscale, memory0)
+        logbeta <- bwdeqns[[6]]
     }
 #
 ##E-step
@@ -109,8 +109,8 @@ hmm0norm2d <- function( R, Z, pie, gamma, mu, sig, delta, tol=1e-6, print.level=
         w <- array(0.0, c( nn-1, m, m ) )
 # logalpha can contain -Inf values where phi=0; set NAOK=TRUE as the Fortran code
 # will handle such cases safely
-        estep <- .Fortran("estep", m, nn, logalpha, logbeta, LL,
-                          pRS, gamma, v, w, NAOK=TRUE, PACKAGE="HMMextra0s")
+        estep <- .Fortran(F_estep, m, nn, logalpha, logbeta, LL,
+                          pRS, gamma, v, w, NAOK=TRUE)
         v <- estep[[8]]
         w <- estep[[9]]
     }
@@ -134,9 +134,8 @@ hmm0norm2d <- function( R, Z, pie, gamma, mu, sig, delta, tol=1e-6, print.level=
             }
         }
     } else {
-        mstep2d <- .Fortran("mstep2d", n, m, nn, v, Z, R,
-                            hatpie, hatmu, hatsig,
-                            PACKAGE="HMMextra0s")
+        mstep2d <- .Fortran(F_mstep2d, n, m, nn, v, Z, R,
+                            hatpie, hatmu, hatsig)
         hatpie <- mstep2d[[7]]
         hatmu <- mstep2d[[8]]
         hatsig <- mstep2d[[9]]

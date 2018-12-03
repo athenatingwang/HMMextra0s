@@ -3,7 +3,7 @@ importFrom("grDevices", "gray")
 importFrom("graphics", "axis", "box", "lines", "par", "plot", "points",
              "polygon", "text")
 importFrom("stats", "pnorm", "rnorm", "runif")
-useDynLib(HMMextra0s,.registration = TRUE)
+useDynLib(HMMextra0s,.registration = TRUE, .fixes = "F_")
 export(hmm0norm)
 export(sim.hmm0norm)
 export(cumdist.hmm0norm)
